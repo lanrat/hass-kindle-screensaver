@@ -2,11 +2,17 @@
 
 kill_kindle() {
     /etc/init.d/framework stop >/dev/null 2>&1
+    /sbin/stop framework  >/dev/null 2>&1
     /etc/init.d/cmd stop >/dev/null 2>&1
+    /sbin/stop cmd  >/dev/null 2>&1
     /etc/init.d/phd stop >/dev/null 2>&1
+    /sbin/stop phd  >/dev/null 2>&1
     /etc/init.d/volumd stop >/dev/null 2>&1
+    /sbin/stop volumd  >/dev/null 2>&1
     /etc/init.d/tmd stop >/dev/null 2>&1
-    /etc/init.d/webreader stop >/dev/null 2>&1
+    /sbin/stop tmd  >/dev/null 2>&1
+    /etc/init.d/webreaderd stop >/dev/null 2>&1
+    /sbin/stop webreaderd  >/dev/null 2>&1
     killall lipc-wait-event >/dev/null 2>&1
 }
 

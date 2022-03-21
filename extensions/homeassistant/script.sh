@@ -130,17 +130,31 @@ while true; do
             logger "Ping worked successfully"
 
             echo "Downloading and drawing image"
-            DOWNLOADRESULT=$(wget -q "$IMAGE_URI" -O $TMPFILE)
+            c="$(cat "$SCRIPTDIR/count.txt")"
+            batteryLevel=`/usr/bin/powerd_test -s | awk -F: '/Battery Level/ {print substr($2, 0, length($2)-1) - 0}'`
+            isCharging=`/usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}'`
+            DOWNLOADRESULT=$(wget -q "$IMAGE_URI?name=$KINDLE_NAME&batteryLevel=$batteryLevel&isCharging=$isCharging&c=$c" -O $TMPFILE)
             logger "Download result ${DOWNLOADRESULT}"
             echo $DOWNLOADRESULT
             if $DOWNLOADRESULT; then
                 mv $TMPFILE $SCREENSAVERFILE
                 logger "Screen saver image file updated"
+                # check refresh counter
+                logger "update count $c"
+                #if ! (($c % $REFRESH_EVERY)); then
+                #    /mnt/us/bin/fbink --quiet -hk
+                #fi
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then
                     eips -c
                     sleep 1
                 fi
-                eips -f -g ${SCREENSAVERFILE}
+                # use fbink
+                # eips -f -g ${SCREENSAVERFILE}
+                /mnt/us/bin/fbink --quiet --flash -g w=-1,file="${SCREENSAVERFILE}"
+                # display update time
+                /mnt/us/bin/fbink  --quiet --flash --size 1 -y -1 -f "$(TZ=GMT+8 date -R +'%H:%M')" 
+                c=$((c+1))
+                echo "$c" > "$SCRIPTDIR/count.txt"
             else
                 logger "Error updating screensaver"
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then

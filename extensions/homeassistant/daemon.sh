@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 DAEMON_PATH="/mnt/us/extensions/homeassistant"
 
@@ -21,6 +21,7 @@ start)
         else
             echo $PID > $PIDFILE
             printf "%s\n" "Ok"
+            echo "0" > "$DAEMON_PATH/count.txt"
         fi
 ;;
 status)
@@ -30,7 +31,7 @@ status)
             if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
                 printf "%s\n" "Process dead but pidfile exists"
             else
-                echo "Running"
+                echo "Running: $(cat $DAEMON_PATH/count.txt)"
             fi
         else
             printf "%s\n" "Service not running"
@@ -42,6 +43,7 @@ stop)
             cd $DAEMON_PATH
         if [ -f $PIDFILE ]; then
             kill -HUP $PID
+            rm "$DAEMON_PATH/count.txt"
             printf "%s\n" "Ok"
             rm -f $PIDFILE
         else

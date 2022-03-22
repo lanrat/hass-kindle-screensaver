@@ -155,6 +155,9 @@ while true; do
                 /mnt/us/bin/fbink  --quiet --flash --size 1 -y -1 -f "$(TZ=GMT+8 date -R +'%H:%M')" 
                 c=$((c+1))
                 echo "$c" > "$SCRIPTDIR/count.txt"
+                
+                logger "hiding the status bar"
+                lipc-set-prop com.lab126.pillow disableEnablePillow disable
             else
                 logger "Error updating screensaver"
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then

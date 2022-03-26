@@ -129,11 +129,15 @@ while true; do
         if [ ${PINGNOTWORKING} -eq 0 ]; then
             logger "Ping worked successfully"
 
+            IP="$(ip addr show $NET |  awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}')"
+            MAC_ADDRESS="$(cat /sys/class/net/$NET/address)"
+            SN="$(cat /proc/usid)"
+
             echo "Downloading and drawing image"
             c="$(cat "$SCRIPTDIR/count.txt")"
             batteryLevel=`/usr/bin/powerd_test -s | awk -F: '/Battery Level/ {print substr($2, 0, length($2)-1) - 0}'`
             isCharging=`/usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}'`
-            DOWNLOADRESULT=$(wget -q "$IMAGE_URI?name=$KINDLE_NAME&batteryLevel=$batteryLevel&isCharging=$isCharging&c=$c" -O $TMPFILE)
+            DOWNLOADRESULT=$(wget -q "$IMAGE_URI?name=$KINDLE_NAME&batteryLevel=$batteryLevel&isCharging=$isCharging&c=$c&ip=$IP&mac=$MAC_ADDRESS&sn=$SN" -O $TMPFILE)
             logger "Download result ${DOWNLOADRESULT}"
             echo $DOWNLOADRESULT
             if $DOWNLOADRESULT; then
@@ -152,7 +156,7 @@ while true; do
                 # eips -f -g ${SCREENSAVERFILE}
                 /mnt/us/bin/fbink --quiet --flash -g w=-1,file="${SCREENSAVERFILE}"
                 # display update time
-                /mnt/us/bin/fbink  --quiet --flash --size 1 -y -1 -f "$(TZ=GMT+8 date -R +'%H:%M')" 
+                /mnt/us/bin/fbink  --quiet --flash --size 1 -y -1 -f "$(date -R +'%H:%M')"
                 c=$((c+1))
                 echo "$c" > "$SCRIPTDIR/count.txt"
                 

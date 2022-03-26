@@ -1,10 +1,11 @@
 #!/bin/sh
 
-#KINDLE_NAME="KA"
-KINDLE_NAME="KTB"
+
+## Defaults
+
+KINDLE_NAME=""
 INTERVAL=500                             # (sec) - how often to update the script
-#IMAGE_URI="http://192.168.2.4:5000/2.png" # URL of image to fetch. Keep in mind that the Kindle 4 does not support SSL/TLS requests
-IMAGE_URI="http://192.168.2.4:5000/3.png"
+IMAGE_URI="http://192.168.2.4:5000/2.png" # URL of image to fetch. Keep in mind that the Kindle 4 does not support SSL/TLS requests
 CLEAR_SCREEN_BEFORE_RENDER=0            # If "1", then the screen is completely cleared before rendering the newly fetched image to avoid "shadows".
 INTERVAL_ON_ERROR=30                    # In case of errors, the device waits this long until the next loop.
 BATTERYALERT=15                         # if the battery level is equal to or below this threshold, a info will be displayed
@@ -13,8 +14,7 @@ BATTERYSLEEP=3600                       # 1 day sleep time when Battery Level is
 PINGHOST="www.google.com"               # which domain (or IP) to ping to check internet connectivity.
 ROUTERIP="192.168.2.1"                  # router gateway IP. The Kindle appears to sometimes forget the gateway's IP and we need to set this manually.
 LOGGING=1                               # if enabled, the script logs into a file
-# I think setting this too high can cause the top bar to appear on the KT (default 10)
-DELAY_BEFORE_SUSPEND=5                 # seconds to wait between drawing image and suspending. This gives you time to SSH into your device if it's inside the photo frame and stop the daemon
+DELAY_BEFORE_SUSPEND=10                 # seconds to wait between drawing image and suspending. This gives you time to SSH into your device if it's inside the photo frame and stop the daemon
 RESTART_POWERD_THRESHOLD=50             # restart powerd if battery percentage is below this value, if a power source is connected and the charging current is negative
 
 
@@ -37,3 +37,25 @@ SCREENSAVERFILE="${SCRIPTDIR}/cover.png"
 
 USE_RTC=1 # if 0, only sleep will be used (which is useful for debugging)
 RTC=1     # use rtc1 by default
+
+# timezone for date comment
+TZ="GMT+7" # for summer time
+# TZ="GMT+8" for winter time
+
+MAC_SUFFIX="$(cat /sys/class/net/$NET/address | cut -d: -f4-6)"
+
+## Device Specific Overrides
+case "$MAC_SUFFIX" in
+   "af:95:92")
+      KINDLE_NAME="Kindle4"
+      IMAGE_URI="http://192.168.2.4:5000/2.png"
+      ;;
+   "52:f2:b3")
+      KINDLE_NAME="KindleTouch"
+      IMAGE_URI="http://192.168.2.4:5000/3.png"
+      ;;
+   *)
+     KINDLE_NAME="Unknown Device"
+     echo "Unknown MAC_SUFFIX: $MAC_SUFFIX"
+     ;;
+esac

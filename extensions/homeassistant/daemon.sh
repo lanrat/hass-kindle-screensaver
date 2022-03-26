@@ -44,7 +44,7 @@ stop)
         if [ -f $PIDFILE ]; then
             kill -HUP $PID
             rm "$DAEMON_PATH/count.txt"
-            lipc-set-prop com.lab126.pillow disableEnablePillow enable
+            lipc-set-prop com.lab126.pillow disableEnablePillow enable 2>/dev/null
             printf "%s\n" "Ok"
             rm -f $PIDFILE
         else

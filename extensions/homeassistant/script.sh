@@ -49,8 +49,8 @@ while true; do
     
     if [ ${CHECKBATTERY} -le ${BATTERYLOW} ]; then
         logger "Battery below ${BATTERYLOW}"
-        eips -f -g "${LIMGBATT}"
-        ./rtcwake -d rtc$RTC -s $BATTERYSLEEP -m mem
+        $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${LIMGBATT}"
+        $SCRIPTDIR/bin/rtcwake -d rtc$RTC -s $BATTERYSLEEP -m mem
         sleep 30 # waiting time when charging until battery level is higher than "BATTERYLOW" otherwise it will fall into sleep again
     else
         logger "Remaining battery ${CHECKBATTERY}"
@@ -78,7 +78,7 @@ while true; do
             logger "DEBUG ifconfig $(ifconfig ${NET})"
             logger "DEBUG cmState $(lipc-get-prop com.lab126.wifid cmState)"
             logger "DEBUG signalStrength $(lipc-get-prop com.lab126.wifid signalStrength)"
-            eips -f -g "${LIMGERRWIFI}"
+            $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${LIMGERRWIFI}"
             WLANNOTCONNECTED=1
             ERROR_SUSPEND=1 #short sleeptime will be activated
             break 1
@@ -114,7 +114,8 @@ while true; do
                 CMSTATE=$(lipc-get-prop com.lab126.wifid cmState)
                 logger "DEBUG cmState ${CMSTATE}"
                 logger "DEBUG signalStrength $(lipc-get-prop com.lab126.wifid signalStrength)"
-                eips -f -g "${LIMGERRWIFI}"
+                $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${LIMGERRWIFI}"
+                
                 PINGNOTWORKING=1
                 ERROR_SUSPEND=1 #short sleeptime will be activated
                 break 1
@@ -129,46 +130,71 @@ while true; do
         if [ ${PINGNOTWORKING} -eq 0 ]; then
             logger "Ping worked successfully"
 
-            IP="$(ip addr show $NET |  awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}')"
+            
+            iwconfig=/sbin/iwconfig
+            if [ -f /usr/sbin/iwconfig ]; then
+                iwconfig=/usr/sbin/iwconfig
+            fi
+
+            # get data to send
+            IP="$(ip addr show $NET | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}')"
             MAC_ADDRESS="$(cat /sys/class/net/$NET/address)"
             SN="$(cat /proc/usid)"
+            BOOTTIME="$(stat -c %Z /)"
+            WIFISIGNAL="$($iwconfig $NET | grep level | cut -d: -f3 | cut -d' ' -f1)"
+            COUNT="$(cat "$SCRIPTDIR/count.txt")"
+            BATTERYLEVEL="$(/usr/bin/powerd_test -s | awk -F: '/Battery Level/ {print substr($2, 0, length($2)-1) - 0}')"
+            CHARGING=false
+            if /usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}' | grep -qi 'yes'; then
+                CHARGING=true
+            fi
 
             echo "Downloading and drawing image"
-            c="$(cat "$SCRIPTDIR/count.txt")"
-            batteryLevel=`/usr/bin/powerd_test -s | awk -F: '/Battery Level/ {print substr($2, 0, length($2)-1) - 0}'`
-            isCharging=`/usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}'`
-            DOWNLOADRESULT=$(wget -q "$IMAGE_URI?name=$KINDLE_NAME&batteryLevel=$batteryLevel&isCharging=$isCharging&c=$c&ip=$IP&mac=$MAC_ADDRESS&sn=$SN" -O $TMPFILE)
+            curl --insecure \
+                --retry 3 \
+                --silent \
+                --location \
+                --output test.png \
+                --header "X-HASS-Name: $KINDLE_NAME" \
+                --header "X-HASS-IP: $IP" \
+                --header "X-HASS-Mac_Address: $MAC_ADDRESS" \
+                --header "X-HASS-Serail_Number: $SN" \
+                --header "X-HASS-Boot_Time: $BOOTTIME" \
+                --header "X-HASS-WiFi_Signal: $WIFISIGNAL" \
+                --header "X-HASS-Count: $COUNT" \
+                --header "X-HASS-Battery_Level: $BATTERYLEVEL" \
+                --header "X-HASS-Charging: $CHARGING" \
+                "$IMAGE_URI"
+            DOWNLOADRESULT=$?
             logger "Download result ${DOWNLOADRESULT}"
             echo $DOWNLOADRESULT
-            if $DOWNLOADRESULT; then
+            if ! $DOWNLOADRESULT; then
                 mv $TMPFILE $SCREENSAVERFILE
                 logger "Screen saver image file updated"
                 # check refresh counter
                 logger "update count $c"
                 #if ! (($c % $REFRESH_EVERY)); then
-                #    /mnt/us/bin/fbink --quiet -hk
+                #    $SCRIPTDIR/bin/fbink --quiet -hk
                 #fi
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then
                     eips -c
                     sleep 1
                 fi
-                # use fbink
-                # eips -f -g ${SCREENSAVERFILE}
-                /mnt/us/bin/fbink --quiet --flash -g w=-1,file="${SCREENSAVERFILE}"
+                $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${SCREENSAVERFILE}"
                 # display update time
-                /mnt/us/bin/fbink  --quiet --flash --size 1 -y -1 -f "$(date -R +'%H:%M')"
+                $SCRIPTDIR/bin/fbink --quiet --flash --size 1 -y -1 "$(TZ=$TZ date -R +'%H:%M')"
                 c=$((c+1))
                 echo "$c" > "$SCRIPTDIR/count.txt"
                 
-                logger "hiding the status bar"
-                lipc-set-prop com.lab126.pillow disableEnablePillow disable
+                #logger "hiding the status bar"
+                lipc-set-prop com.lab126.pillow disableEnablePillow disable 2>/den/null
             else
                 logger "Error updating screensaver"
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then
                     eips -c
                     sleep 1
                 fi
-                eips -f -g ${LIMGERR} #show error picture
+                $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${LIMGERR}"
                 ERROR_SUSPEND=1       #short sleep time will be activated
             fi
 
@@ -176,7 +202,7 @@ while true; do
             logger "Removed temporary files"
 
             if [ ${CHECKBATTERY} -le ${BATTERYALERT} ]; then
-                eips 2 2 -h " Battery at ${CHECKBATTERY}%, please charge "
+                $SCRIPTDIR/bin/fbink --quiet --flash --centered --row -3 --size 4 "Battery at ${CHECKBATTERY}%, please charge"
             fi
         fi
     fi
@@ -197,7 +223,7 @@ while true; do
         fi
 
         if [ ${USE_RTC} -eq 1 ]; then
-            ./rtcwake -d rtc$RTC -s $INTERVAL_ON_ERROR -m mem
+            $SCRIPTDIR/bin/rtcwake -d rtc$RTC -s $INTERVAL_ON_ERROR -m mem
         else
             sleep $INTERVAL_ON_ERROR
         fi
@@ -208,7 +234,7 @@ while true; do
         logger "SUCCESS, will update again on ${WAKEUPTIME}"
 
         if [ ${USE_RTC} -eq 1 ]; then
-            ./rtcwake -d rtc$RTC -s $INTERVAL -m mem
+            $SCRIPTDIR/bin/rtcwake -d rtc$RTC -s $INTERVAL -m mem
         else
             sleep $INTERVAL
         fi

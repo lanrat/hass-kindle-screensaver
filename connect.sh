@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$#" -ne 2 ]; then
-    echo "pass IP of kindle and command [update, ssh, start]"
+    echo "usage: $0 [kindle_IP] [update | ssh | start | copy-ssh-key]"
     exit 1
 fi
 
@@ -22,6 +22,8 @@ elif [ $COMMAND == "ssh" ]; then
     ssh -o ConnectTimeout=1 root@$IP
 elif [ $COMMAND == "start" ]; then
     ssh -o ConnectTimeout=1 root@$IP /mnt/us/extensions/homeassistant/daemon.sh start
+elif [ $COMMAND == "copy-ssh-key" ]; then
+    cat "$HOME/.ssh/id_rsa.pub" | ssh -o ConnectTimeout=1 root@$IP "cat - >> /mnt/us/usbnet/etc/authorized_keys"
 else
   echo "unknown command: $COMMAND"
   exit 2

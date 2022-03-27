@@ -176,6 +176,10 @@ while true; do
                 #if ! (($c % $REFRESH_EVERY)); then
                 #    $SCRIPTDIR/bin/fbink --quiet -hk
                 #fi
+
+                #logger "hiding the status bar"
+                lipc-set-prop com.lab126.pillow disableEnablePillow disable 2>/den/null
+
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then
                     eips -c
                     sleep 1

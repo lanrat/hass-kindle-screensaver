@@ -1,5 +1,11 @@
 # Notes
 
+## Update
+
+```sh
+./update.sh $KINDLE_IP update
+```
+
 ## fix for timezone
 https://wiki.mobileread.com/wiki/Kindle_Touch_Hacking#Setting_the_time_zone
 

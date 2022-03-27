@@ -158,7 +158,7 @@ while true; do
                 --header "X-HASS-Name: $KINDLE_NAME" \
                 --header "X-HASS-IP: $IP" \
                 --header "X-HASS-Mac_Address: $MAC_ADDRESS" \
-                --header "X-HASS-Serail_Number: $SN" \
+                --header "X-HASS-Serial_Number: $SN" \
                 --header "X-HASS-Boot_Time: $BOOTTIME" \
                 --header "X-HASS-WiFi_Signal: $WIFISIGNAL" \
                 --header "X-HASS-Count: $COUNT" \

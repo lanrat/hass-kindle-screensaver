@@ -3,7 +3,7 @@
 ## Update
 
 ```sh
-./update.sh $KINDLE_IP update
+./connect.sh $KINDLE_IP update
 ```
 
 ## fix for timezone

@@ -6,6 +6,8 @@
 ./connect.sh $KINDLE_IP update
 ```
 
+In order to use `connect.sh` ensure that `USE_WIFI` and`USE_WIFI_SSHD_ONLY` are set to true in `/mnt/us/usbnet/etc/config`.
+
 ## fix for timezone
 https://wiki.mobileread.com/wiki/Kindle_Touch_Hacking#Setting_the_time_zone
 

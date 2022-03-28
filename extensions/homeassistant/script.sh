@@ -179,7 +179,7 @@ while true; do
 
                 #logger "hiding the status bar"
                 lipc-set-prop com.lab126.pillow disableEnablePillow disable 2>/den/null
-                $SCRIPTDIR/bin/wmctrl -r L:A_N:titleBar_ID:system -e '0,0,0,600,1' 2>/dev/null
+                $SCRIPTDIR/bin/wmctrl -r L:C_N:titleBar_ID:system -e '0,0,0,600,1' 2>/dev/null
 
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then
                     eips -c
@@ -193,7 +193,7 @@ while true; do
                 
                 #logger "hiding the status bar"
                 lipc-set-prop com.lab126.pillow disableEnablePillow disable 2>/den/null
-                $SCRIPTDIR/bin/wmctrl -r L:A_N:titleBar_ID:system -e '0,0,0,600,1' 2>/dev/null
+                $SCRIPTDIR/bin/wmctrl -r L:C_N:titleBar_ID:system -e '0,0,0,600,1' 2>/dev/null
             else
                 logger "Error updating screensaver"
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then

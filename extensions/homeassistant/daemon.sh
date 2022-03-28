@@ -45,6 +45,7 @@ stop)
             kill -HUP $PID
             rm "$DAEMON_PATH/count.txt"
             lipc-set-prop com.lab126.pillow disableEnablePillow enable 2>/dev/null
+            $DAEMON_PATH/bin/wmctrl -r L:C_N:titleBar_ID:system -e '0,0,0,600,30' 2>/dev/null
             printf "%s\n" "Ok"
             rm -f $PIDFILE
         else

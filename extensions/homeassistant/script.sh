@@ -130,7 +130,6 @@ while true; do
         if [ ${PINGNOTWORKING} -eq 0 ]; then
             logger "Ping worked successfully"
 
-            
             iwconfig=/sbin/iwconfig
             if [ -f /usr/sbin/iwconfig ]; then
                 iwconfig=/usr/sbin/iwconfig
@@ -188,6 +187,10 @@ while true; do
                 $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${SCREENSAVERFILE}"
                 # display update time
                 $SCRIPTDIR/bin/fbink --quiet --flash --size 1 -y -1 "$(TZ=$TZ date -R +'%H:%M')"
+                # display battery %
+                bat="${BATTERYLEVEL}%"
+                batLen="$(echo -n "$bat" | wc -c)"
+                $SCRIPTDIR/bin/fbink --quiet --flash --size 1 -y -1 -x -"$batLen" "$bat"
                 c=$((c+1))
                 echo "$c" > "$SCRIPTDIR/count.txt"
                 

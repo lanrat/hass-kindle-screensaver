@@ -154,7 +154,7 @@ while true; do
                 --retry 3 \
                 --silent \
                 --location \
-                --output test.png \
+                --output $TMPFILE \
                 --header "X-HASS-Name: $KINDLE_NAME" \
                 --header "X-HASS-IP: $IP" \
                 --header "X-HASS-Mac_Address: $MAC_ADDRESS" \

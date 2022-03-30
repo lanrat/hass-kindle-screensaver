@@ -44,5 +44,5 @@ logger() {
         $LOGFILE=stdout
     fi
 
-    echo $(date): $MSG >>$LOGFILE
+    echo $(TZ=$TZ date): $MSG >>$LOGFILE
 }

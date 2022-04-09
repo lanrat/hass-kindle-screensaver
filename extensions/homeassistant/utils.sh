@@ -46,3 +46,18 @@ logger() {
 
     echo $(TZ=$TZ date): $MSG >>$LOGFILE
 }
+
+
+hideStatusBar() {
+    #logger "hiding the status bar"
+    $SCRIPTDIR/bin/wmctrl -r L:C_N:titleBar_ID:system -e '0,0,0,600,1' 2>/dev/null
+    lipc-set-prop com.lab126.pillow disableEnablePillow disable 2>/den/null
+}
+
+hideStatusBarLoop() {
+    while true
+    do
+        hideStatusBar
+        sleep 5
+    done
+}

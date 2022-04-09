@@ -36,3 +36,13 @@ iptables -A INPUT -i wlan0 -p icmp -j ACCEPT
 ```
 
 Or create `/mnt/us/usbnet/etc/authorized_keys` with keys.
+
+
+## Other binaries for Kindles
+
+arm bins on kindles
+* https://www.mobileread.com/forums/showthread.php?t=240616
+
+defunct
+* https://wiki.mobileread.com/wiki/Optware
+* https://www.mobileread.com/forums/showthread.php?t=118472

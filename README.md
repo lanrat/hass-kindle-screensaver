@@ -1,6 +1,6 @@
-# Kindle 4 Non Touch Home Assistant Lovelace Dashboard
+# Kindle 4 Non Touch & Touch Home Assistant Lovelace Dashboard
 
-This repository gives details about how I built my own Home Assistant dashboard using an old Kindle 4 non touch.
+This repository gives details about how I built my own Home Assistant dashboard using an old Kindle 4.
 
 A lovelace UI panel of your Home Assistant instance is rendered to an image and polled from a jailbroken Kindle 4 on a regular basis.
 
@@ -11,7 +11,7 @@ A lovelace UI panel of your Home Assistant instance is rendered to an image and 
 I keep this short as I think this should be pretty straight forward.
 
 1. Set up [Home Assistant](http://home-assistant.io/) on the platform of your choice.
-1. Set up the rendering software i.e. using docker, [see my hass-lovelace-kindle-screensaver](https://github.com/sibbl/hass-lovelace-kindle-screensaver/) repository.
+1. Set up the rendering software i.e. using docker, see my [hass-screenshot](https://github.com/lanrat/hass-screenshot) repository.
 
 Hints:
 
@@ -20,7 +20,6 @@ Hints:
 
 **Finally**, You should end up with a URL pointing to the exposed port of the rendering docker container to configure this on your kindle as described in the following section.
 
-This URL needs to be plain HTTP as no TLS or SSL is supported by the Kindle 4. If your server is HTTPS only (which is a good thing!), I recommend using a free CDN like [Hostry](https://www.hostry.com).
 
 ## Hardware
 
@@ -30,7 +29,7 @@ If you're using a Paperwhite, it's probably better to use the [online screensave
 
 Thus, a bit more work was necessary to get a reliable solution for a good Kindle 4 experience.
 
-1. Jailbreak your Kindle 4 Non Touch [as described here](https://www.mobileread.com/forums/showthread.php?t=191158).
+1. Jailbreak your Kindle 4 [as described here](https://www.mobileread.com/forums/showthread.php?t=191158). (copies of the needed files can be found in the `hacks` directory of this repository)
 1. Install USBNetwork so that you can SSH into your device. [See download including instructions here](https://www.mobileread.com/forums/showthread.php?t=88004).
 1. Install Mobileread Kindle Kit (MKK) so that KUAL can be used. [See download including instructions here](https://www.mobileread.com/forums/showthread.php?t=233932).
 1. Copy KUAL v1 azw file into `/mnt/us/documents` [as described here](https://www.mobileread.com/forums/showthread.php?t=203326).
@@ -50,13 +49,15 @@ There are two possibilities to SSH into your Kindle to change your config or deb
 
 For debugging purposes, `LOGGING` can be configured to `1` so that an extended log is written to `extensions/homeassistant/homeassistant.log`.
 
+The included [notes.md](notes.md) file included information on the `connect.sh` script which can automate a lot of this and also supports pushing updates.
+
 ## Photo frame
 
 Similarly to [this project](https://marios-blog.com/2020/01/22/digitaler-bilderrahmen-mit-kindle-paperwhite/), I've bought a 13x18 cm photo frame from an online store over here in Germany.
 
-My wife and I removed the front cover of the Kindle 4 and also decided to remove the mainboard from the frame as there wasn't enough space to plug a Micro USB cable into the device's bottom while keeping it centered. A 90 degree adapter might be a better choice, also depending on the exact size of the frame.
+My wife and I removed the front cover of the Kindle 4 and also decided to remove the main board from the frame as there wasn't enough space to plug a Micro USB cable into the device's bottom while keeping it centered. A 90 degree adapter might be a better choice, also depending on the exact size of the frame.
 
-The following photo should demonstrate it. The connectors beetween the battery and screen are the most important, the ones of the side buttons are not required. Of course, the photo also clearly indicates that we're both software developers...
+The following photo should demonstrate it. The connectors between the battery and screen are the most important, the ones of the side buttons are not required. Of course, the photo also clearly indicates that we're both software developers...
 
 ![Inside photo](https://raw.githubusercontent.com/sibbl/hass-lovelace-kindle-4/main/assets/inside.jpg)
 

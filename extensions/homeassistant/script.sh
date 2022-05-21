@@ -194,12 +194,16 @@ while true; do
                     #hideStatusBar
                 fi
                 $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${SCREENSAVERFILE}"
-                # display update time
-                $SCRIPTDIR/bin/fbink --quiet --flash --size 1 -y -1 "$(TZ=$TZ date -R +'%H:%M')"
-                # display battery %
-                bat="${BATTERYLEVEL}%"
-                batLen="$(echo -n "$bat" | wc -c)"
-                $SCRIPTDIR/bin/fbink --quiet --flash --size 1 -y -1 -x -"$batLen" "$bat"
+                if [ "$DISPLAY_REFRESH_TIME" = true ] ; then
+                    # display update time
+                    $SCRIPTDIR/bin/fbink --quiet --flash --size 1 -y -1 "$(TZ=$TZ date -R +'%H:%M')"
+                fi
+                if [ "$DISPLAY_BATTERY_LEVEL" = true ] ; then
+                    # display battery %
+                    bat="${BATTERYLEVEL}%"
+                    batLen="$(echo -n "$bat" | wc -c)"
+                    $SCRIPTDIR/bin/fbink --quiet --flash --size 1 -y -1 -x -"$batLen" "$bat"
+                fi
                 c=$((c+1))
                 echo "$c" > "$SCRIPTDIR/count.txt"
                 

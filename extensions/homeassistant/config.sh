@@ -15,7 +15,8 @@ PINGHOST="$ROUTERIP"                      # which domain (or IP) to ping to chec
 LOGGING=1                                 # if enabled, the script logs into a file
 DELAY_BEFORE_SUSPEND=5                    # seconds to wait between drawing image and suspending. This gives you time to SSH into your device if it's inside the photo frame and stop the daemon
 RESTART_POWERD_THRESHOLD=50               # restart powerd if battery percentage is below this value, if a power source is connected and the charging current is negative
-
+DISPLAY_REFRESH_TIME=true                 # display time of last image refresh in lower left corner
+DISPLAY_BATTERY_LEVEL=true                # display battery percentage on lower right corner
 #REFRESH_EVERY=5 # how often to completely refresh the screen
 
 NAME=homeassistant
@@ -51,7 +52,6 @@ case "$MAC_SUFFIX" in
       IMAGE_URI="http://192.168.2.4:5000/3.png"
       ;;
    *)
-     KINDLE_NAME="Unknown Device"
-     echo "Unknown MAC_SUFFIX: $MAC_SUFFIX"
+     KINDLE_NAME="Kindle_$MAC_SUFFIX"
      ;;
 esac

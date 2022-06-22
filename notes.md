@@ -29,7 +29,7 @@ iptables -A INPUT -i wlan0 -p icmp -j ACCEPT
 * https://www.hardanswers.net/amazon-kindle-root-password
 
 
-## loggin in with keys
+## logging in with keys
 
 ```sh
 ./connect.sh $KINDLE_IP copy-ssh-key

@@ -8,10 +8,16 @@ fi
 IP="$1"
 COMMAND="$2"
 
-until ssh -o ConnectTimeout=1 root@$IP /mnt/us/extensions/homeassistant/daemon.sh stop
+i=0
+until ssh -o ConnectTimeout=1 root@$IP /mnt/us/extensions/homeassistant/daemon.sh stop 2>/dev/null
 do
-    echo "waiting..."
+    # only print every 5th itneration....
+    ((i % 60 == 0)) && echo -ne "\n[$(date)] waiting"
+    echo -n "."
+    ((i=i+1))
+    sleep 0.5
 done
+echo ""
 
 if [ $COMMAND == "update" ]; then
     echo "Running update for $IP"

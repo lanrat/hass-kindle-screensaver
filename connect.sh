@@ -8,8 +8,10 @@ fi
 IP="$1"
 COMMAND="$2"
 
+ssh_options="-o ConnectTimeout=1 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
+
 i=0
-until ssh -o ConnectTimeout=1 root@$IP /mnt/us/extensions/homeassistant/daemon.sh stop 2>/dev/null
+until ssh $ssh_options "root@$IP" /mnt/us/extensions/homeassistant/daemon.sh stop 2>/dev/null
 do
     # only print every 5th itneration....
     ((i % 60 == 0)) && echo -ne "\n[$(date)] waiting"
@@ -21,15 +23,16 @@ echo ""
 
 if [ $COMMAND == "update" ]; then
     echo "Running update for $IP"
-    rsync -rhP extensions/homeassistant/ root@$IP:/mnt/us/extensions/homeassistant/
-    rsync -rhP kite/ root@$IP:/mnt/us/kite
-    ssh -o ConnectTimeout=1 root@$IP /mnt/us/extensions/homeassistant/daemon.sh start
+    rsync -e "ssh $ssh_options" -rhP extensions/homeassistant/ root@$IP:/mnt/us/extensions/homeassistant/
+    rsync -e "ssh $ssh_options" -rhP kite/ root@$IP:/mnt/us/kite
+    ssh $ssh_options "root@$IP" /mnt/us/extensions/homeassistant/daemon.sh start
 elif [ $COMMAND == "ssh" ]; then
-    ssh -o ConnectTimeout=1 root@$IP
+    ssh  $ssh_options "root@$IP"
 elif [ $COMMAND == "start" ]; then
-    ssh -o ConnectTimeout=1 root@$IP /mnt/us/extensions/homeassistant/daemon.sh start
+    ssh $ssh_options "root@$IP" /mnt/us/extensions/homeassistant/daemon.sh start
 elif [ $COMMAND == "copy-ssh-key" ]; then
-    cat "$HOME/.ssh/id_rsa.pub" | ssh -o ConnectTimeout=1 root@$IP "cat - >> /mnt/us/usbnet/etc/authorized_keys"
+    echo "copying $HOME/.ssh/id_rsa.pub to /mnt/us/usbnet/etc/authorized_keys"
+    cat "$HOME/.ssh/id_rsa.pub" | ssh $ssh_options "root@$IP" "cat - >> /mnt/us/usbnet/etc/authorized_keys"
 else
   echo "unknown command: $COMMAND"
   exit 2

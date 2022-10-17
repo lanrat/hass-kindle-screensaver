@@ -3,13 +3,13 @@
 ## Defaults
 
 KINDLE_NAME=""
-INTERVAL=$((20*60))                       # (sec) - how often to update the script
+INTERVAL=$((10*60))                       # (sec) - how often to update the script
 IMAGE_URI="http://192.168.2.4:5000/2.png" # URL of image to fetch. Keep in mind that the Kindle 4 does not support SSL/TLS requests
 CLEAR_SCREEN_BEFORE_RENDER=0              # If "1", then the screen is completely cleared before rendering the newly fetched image to avoid "shadows".
 INTERVAL_ON_ERROR=30                      # In case of errors, the device waits this long until the next loop.
 BATTERYALERT=15                           # if the battery level is equal to or below this threshold, a info will be displayed
 BATTERYLOW=5                              # if the battery level is equal to or below this threshold, the "please charge" image will be shown and the device will sleep for a long time until it checks again (or boots up and starts the script again)
-BATTERYSLEEP=3600                         # 1 day sleep time when Battery Level is equal or below the "BATTERYLOW" threshold, see above.
+BATTERYSLEEP=3600                         # 1 hr sleep time when Battery Level is equal or below the "BATTERYLOW" threshold, see above.
 ROUTERIP="192.168.2.1"                    # router gateway IP. The Kindle appears to sometimes forget the gateway's IP and we need to set this manually.
 PINGHOST="$ROUTERIP"                      # which domain (or IP) to ping to check internet connectivity.
 LOGGING=1                                 # if enabled, the script logs into a file

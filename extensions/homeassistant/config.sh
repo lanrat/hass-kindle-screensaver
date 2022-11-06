@@ -14,10 +14,10 @@ ROUTERIP="192.168.2.1"                    # router gateway IP. The Kindle appear
 PINGHOST="$ROUTERIP"                      # which domain (or IP) to ping to check internet connectivity.
 LOGGING=1                                 # if enabled, the script logs into a file
 DELAY_BEFORE_SUSPEND=5                    # seconds to wait between drawing image and suspending. This gives you time to SSH into your device if it's inside the photo frame and stop the daemon
-RESTART_POWERD_THRESHOLD=50               # restart powerd if battery percentage is below this value, if a power source is connected and the charging current is negative
+RESTART_POWERD_THRESHOLD=20               # restart powerd if battery percentage is below this value, if a power source is connected and the charging current is negative
 DISPLAY_REFRESH_TIME=true                 # display time of last image refresh in lower left corner
 DISPLAY_BATTERY_LEVEL=true                # display battery percentage on lower right corner
-#REFRESH_EVERY=5 # how often to completely refresh the screen
+REFRESH_EVERY=5 # how often to completely refresh the screen (per screen refresh)
 
 NAME=homeassistant
 SCRIPTDIR="/mnt/us/extensions/homeassistant"
@@ -36,8 +36,8 @@ USE_RTC=1 # if 0, only sleep will be used (which is useful for debugging)
 RTC=1     # use rtc1 by default
 
 # timezone for date comment
-TZ="GMT+7" # for summer time
-# TZ="GMT+8" for winter time
+#TZ="GMT+7" # for summer time
+TZ="GMT+8" # for winter time
 
 MAC_SUFFIX="$(cat /sys/class/net/$NET/address | cut -d: -f4-6)"
 
@@ -50,6 +50,7 @@ case "$MAC_SUFFIX" in
    "52:f2:b3")
       KINDLE_NAME="KindleTouch"
       IMAGE_URI="http://192.168.2.4:5000/3.png"
+      USE_RTC=0 # test keping up to keep title bar hidden, only use while charging
       ;;
    *)
      KINDLE_NAME="Kindle_$MAC_SUFFIX"

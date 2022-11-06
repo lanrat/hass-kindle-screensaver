@@ -36,8 +36,6 @@ while true; do
     logger "Set prevent screen saver to true"
     lipc-set-prop com.lab126.powerd preventScreenSaver 1
 
-    #hideStatusBar
-
     echo "Check battery level"
 
     CHARGING_FILE=`kdb get system/driver/charger/SYS_CHARGING_FILE`
@@ -55,9 +53,12 @@ while true; do
     if [ ${CHECKBATTERY} -le ${BATTERYLOW} ]; then
         logger "Battery below ${BATTERYLOW}"
         $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${LIMGBATT}"
-        $SCRIPTDIR/bin/rtcwake -d rtc$RTC -s $BATTERYSLEEP -m mem
-        sleep 30 # waiting time when charging until battery level is higher than "BATTERYLOW" otherwise it will fall into sleep again
-        #hideStatusBar
+        # waiting time when charging until battery level is higher than "BATTERYLOW" otherwise it will fall into sleep again
+        if [ ${USE_RTC} -eq 1 ]; then
+            $SCRIPTDIR/bin/rtcwake -d rtc$RTC -s $BATTERYSLEEP -m mem
+        else
+            sleep $BATTERYSLEEP
+        fi
     else
         logger "Remaining battery ${CHECKBATTERY}"
     fi
@@ -90,10 +91,8 @@ while true; do
             break 1
         fi
         let WLANCOUNTER=WLANCOUNTER+1
-        #hideStatusBar
         logger "Waiting for wifi ${WLANCOUNTER}"
         sleep $WLANCOUNTER
-        #hideStatusBar
     done
 
     if [ ${WLANNOTCONNECTED} -eq 0 ]; then
@@ -132,9 +131,7 @@ while true; do
             logger "Waiting for working ping ${PINGCOUNTER}"
             logger "Trying to set route gateway to ${ROUTERIP}"
             route add default gw ${ROUTERIP}
-            #hideStatusBar
             sleep $PINGCOUNTER
-            #hideStatusBar
         done
 
         if [ ${PINGNOTWORKING} -eq 0 ]; then
@@ -182,16 +179,13 @@ while true; do
                 logger "Screen saver image file updated"
                 # check refresh counter
                 logger "update count $c"
-                #if ! (($c % $REFRESH_EVERY)); then
-                #    $SCRIPTDIR/bin/fbink --quiet -hk
-                #fi
-
-                #hideStatusBar
+                if ! (($c % $REFRESH_EVERY)); then
+                    $SCRIPTDIR/bin/fbink --quiet -hk
+                fi
 
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then
                     eips -c
                     sleep 1
-                    #hideStatusBar
                 fi
                 $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${SCREENSAVERFILE}"
                 if [ "$DISPLAY_REFRESH_TIME" = true ] ; then
@@ -207,14 +201,12 @@ while true; do
                 c=$((c+1))
                 echo "$c" > "$SCRIPTDIR/count.txt"
                 
-                #hideStatusBar
             else
                 logger "Error updating screensaver"
                 if [ ${CLEAR_SCREEN_BEFORE_RENDER} -eq 1 ]; then
                     eips -c
                     sleep 1
                 fi
-                #hideStatusBar
                 $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${LIMGERR}"
                 ERROR_SUSPEND=1       #short sleep time will be activated
             fi
@@ -228,9 +220,7 @@ while true; do
         fi
     fi
 
-    #hideStatusBar
     sleep $DELAY_BEFORE_SUSPEND
-    #hideStatusBar
 
     echo "Calculate next timer and going to sleep"
 

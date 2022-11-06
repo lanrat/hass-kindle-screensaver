@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+set -eu
+set -o pipefail
+if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 if [ "$#" -ne 2 ]; then
     echo "usage: $0 [kindle_IP] [update | ssh | start | copy-ssh-key]"

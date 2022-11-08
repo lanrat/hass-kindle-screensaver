@@ -50,7 +50,7 @@ while true; do
         /etc/init.d/powerd restart
     fi
     
-    if [ ${CHECKBATTERY} -le ${BATTERYLOW} ]; then
+    if [ ${IS_CHARGING} -ne 1 ] && [ ${CHECKBATTERY} -le ${BATTERYLOW} ]; then
         logger "Battery below ${BATTERYLOW}"
         $SCRIPTDIR/bin/fbink --quiet --flash -g w=-1,file="${LIMGBATT}"
         # waiting time when charging until battery level is higher than "BATTERYLOW" otherwise it will fall into sleep again

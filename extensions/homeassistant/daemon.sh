@@ -21,7 +21,7 @@ start)
         fi
     fi
 	printf "%-50s\n" "Starting $NAME..."
-	PID=$($DAEMON $DAEMONOPTS > /dev/null 2>&1 & echo $!)
+	PID=$(cd "$DAEMON_PATH" && $DAEMON $DAEMONOPTS > /dev/null 2>&1 & echo $!)
 	echo "Saving PID $PID to $PIDFILE"
     if [ -z "$PID" ]; then
         printf "%s\n" "Fail"
@@ -64,6 +64,8 @@ stop)
     else
         printf "%s\n" "pidfile not found: $PIDFILE"
     fi
+    # force killling children just in case
+    kill $(pgrep -f "$DAEMON")
     exit
 ;;
 

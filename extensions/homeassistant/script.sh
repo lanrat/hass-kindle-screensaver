@@ -1,6 +1,10 @@
 #!/bin/bash
 if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
 
+# hack to ensure relative paths alwys work
+SCRIPTDIR="/mnt/us/extensions/homeassistant"
+cd "$SCRIPTDIR" || exit 1
+
 # load config
 if [ -e "config.sh" ]; then
     # shellcheck source=./config.sh

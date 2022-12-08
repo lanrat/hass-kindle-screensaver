@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 kill_kindle() {
     /etc/init.d/framework stop >/dev/null 2>&1
@@ -17,17 +17,17 @@ kill_kindle() {
 }
 
 customize_kindle() {
-    mkdir /mnt/us/update.bin.tmp.partial -f # prevent from Amazon updates
+    mkdir -p /mnt/us/update.bin.tmp.partial # prevent from Amazon updates
     touch /mnt/us/WIFI_NO_NET_PROBE         # do not perform a WLAN test
 }
 
 wait_wlan() {
-    return $(lipc-get-prop com.lab126.wifid cmState | grep CONNECTED | wc -l)
+    return "$(lipc-get-prop com.lab126.wifid cmState | grep -c CONNECTED)"
 }
 
 wait_ping() {
     CONNECTED=0
-    /bin/ping -c 1 $PINGHOST >/dev/null && CONNECTED=1
+    /bin/ping -c 1 "$PINGHOST" >/dev/null && CONNECTED=1
     return $CONNECTED
 }
 
@@ -40,18 +40,18 @@ logger() {
     fi
 
     # if no logfile is specified, set a default
-    if [ -z $LOGFILE ]; then
-        $LOGFILE=stdout
+    if [ -z "$LOGFILE" ]; then
+        LOGFILE=stdout
     fi
 
-    echo $(TZ=$TZ date): $MSG >>$LOGFILE
+    echo "$(TZ=$TZ date)": "$MSG" >> $LOGFILE
 }
 
 
 hideStatusBar() {
     #logger "hiding the status bar"
-    $SCRIPTDIR/bin/wmctrl -r L:C_N:titleBar_ID:system -e '0,0,0,600,1' 2>/dev/null
-    lipc-set-prop com.lab126.pillow disableEnablePillow disable 2>/den/null
+    "$SCRIPTDIR/bin/wmctrl" -r L:C_N:titleBar_ID:system -e '0,0,0,600,1' 2>/dev/null
+    lipc-set-prop com.lab126.pillow disableEnablePillow disable 2>/dev/null
 }
 
 hideStatusBarLoop() {

@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 ## Defaults
 
-KINDLE_NAME=""
+KINDLE_NAME="Kindle"
 INTERVAL=$((10*60))                       # (sec) - how often to update the script
 IMAGE_URI="http://192.168.2.4:5000/2.png" # URL of image to fetch. Keep in mind that the Kindle 4 does not support SSL/TLS requests
 CLEAR_SCREEN_BEFORE_RENDER=0              # If "1", then the screen is completely cleared before rendering the newly fetched image to avoid "shadows".
@@ -21,16 +21,16 @@ REFRESH_EVERY=5 # how often to completely refresh the screen (per screen refresh
 
 NAME=homeassistant
 SCRIPTDIR="/mnt/us/extensions/homeassistant"
-LOGFILE="${SCRIPTDIR}/${NAME}.log"
+LOGFILE="$SCRIPTDIR/$NAME.log"
 
 NET="wlan0"
 
-LIMGBATT="${SCRIPTDIR}/images/low_battery.png"
-LIMGERR="${SCRIPTDIR}/images/error.png"
-LIMGERRWIFI="${SCRIPTDIR}/images/no_wifi.png"
+LIMGBATT="$SCRIPTDIR/images/low_battery.png"
+LIMGERR="$SCRIPTDIR/images/error.png"
+LIMGERRWIFI="$SCRIPTDIR/images/no_wifi.png"
 
-TMPFILE="${SCRIPTDIR}/cover.temp.png"
-SCREENSAVERFILE="${SCRIPTDIR}/cover.png"
+TMPFILE="$SCRIPTDIR/cover.temp.png"
+SCREENSAVERFILE="$SCRIPTDIR/cover.png"
 
 USE_RTC=1 # if 0, only sleep will be used (which is useful for debugging)
 RTC=1     # use rtc1 by default

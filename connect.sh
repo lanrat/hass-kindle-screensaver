@@ -5,12 +5,14 @@ if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 if [ "$#" -ne 2 ]; then
-    echo "usage: $0 [kindle_IP] [update | ssh | start | copy-ssh-key]"
+    echo "usage: $0 [kindle_IP] [update | ssh | start | stop | restart | copy-ssh-key]"
     exit 1
 fi
 
 IP="$1"
 COMMAND="$2"
+
+cd "$SCRIPT_DIR"
 
 ssh_options="-o ConnectTimeout=1 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
 
@@ -25,16 +27,19 @@ do
 done
 echo ""
 
-if [ $COMMAND == "update" ]; then
+if [ "$COMMAND" == "update" ]; then
     echo "Running update for $IP"
-    rsync -e "ssh $ssh_options" -rhP extensions/homeassistant/ root@$IP:/mnt/us/extensions/homeassistant/
-    rsync -e "ssh $ssh_options" -rhP kite/ root@$IP:/mnt/us/kite
+    rsync -e "ssh $ssh_options" -rhP extensions/homeassistant/ "root@$IP:/mnt/us/extensions/homeassistant/"
+    rsync -e "ssh $ssh_options" -rhP kite/ "root@$IP:/mnt/us/kite"
+elif [ "$COMMAND" == "ssh" ]; then
+    ssh $ssh_options "root@$IP"
+elif [ "$COMMAND" == "start" ]; then
     ssh $ssh_options "root@$IP" /mnt/us/extensions/homeassistant/daemon.sh start
-elif [ $COMMAND == "ssh" ]; then
-    ssh  $ssh_options "root@$IP"
-elif [ $COMMAND == "start" ]; then
-    ssh $ssh_options "root@$IP" /mnt/us/extensions/homeassistant/daemon.sh start
-elif [ $COMMAND == "copy-ssh-key" ]; then
+elif [ "$COMMAND" == "stop" ]; then
+    ssh $ssh_options "root@$IP" /mnt/us/extensions/homeassistant/daemon.sh stop
+elif [ "$COMMAND" == "restart" ]; then
+    ssh $ssh_options "root@$IP" /mnt/us/extensions/homeassistant/daemon.sh restart
+elif [ "$COMMAND" == "copy-ssh-key" ]; then
     echo "copying $HOME/.ssh/id_rsa.pub to /mnt/us/usbnet/etc/authorized_keys"
     cat "$HOME/.ssh/id_rsa.pub" | ssh $ssh_options "root@$IP" "cat - >> /mnt/us/usbnet/etc/authorized_keys"
 else

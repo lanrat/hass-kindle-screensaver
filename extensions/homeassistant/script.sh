@@ -167,6 +167,8 @@ while true; do
             CHARGING=false
             if /usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}' | grep -qi 'yes'; then
                 CHARGING=true
+                # unable to get accurate battery levels while charing
+                BATTERYLEVEL="unknown"
             fi
 
             logger "Downloading and drawing image"

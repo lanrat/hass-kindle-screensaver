@@ -7,7 +7,6 @@ kill_kindle() {
         /sbin/stop phd  >/dev/null 2>&1
         /sbin/stop volumd  >/dev/null 2>&1
         /sbin/stop tmd  >/dev/null 2>&1
-        /sbin/stop webreaderd  >/dev/null 2>&1
         /sbin/stop webreader  >/dev/null 2>&1
         /sbin/stop todo  >/dev/null 2>&1
     fi

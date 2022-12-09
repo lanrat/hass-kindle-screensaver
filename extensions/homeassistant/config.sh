@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/sh
+
+# shellcheck disable=SC2034  # Unused variables allowed for include
 
 ## Defaults
 
@@ -50,7 +52,6 @@ case "$MAC_SUFFIX" in
    "52:f2:b3")
       KINDLE_NAME="KindleTouch"
       IMAGE_URI="http://192.168.2.4:5000/3.png"
-      USE_RTC=0 # test keping up to keep title bar hidden, only use while charging
       ;;
    *)
      KINDLE_NAME="Kindle_$MAC_SUFFIX"

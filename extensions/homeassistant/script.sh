@@ -1,5 +1,5 @@
-#!/bin/bash
-if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
+#!/bin/sh
+if [ "${TRACE-0}" -eq "1" ]; then set -o xtrace; fi
 
 # hack to ensure relative paths alwys work
 SCRIPTDIR="/mnt/us/extensions/homeassistant"
@@ -7,7 +7,7 @@ cd "$SCRIPTDIR" || exit 1
 
 # load config
 if [ -e "config.sh" ]; then
-    # shellcheck source=./config.sh
+    # shellcheck source=/dev/null
     . ./config.sh
 else
     logger "Could not find config.sh in $(pwd)"
@@ -17,7 +17,7 @@ fi
 
 # load utils
 if [ -e "utils.sh" ]; then
-    # shellcheck source=./utils.sh
+    # shellcheck source=/dev/null
     . ./utils.sh
 else
     logger "Could not find utils.sh in $(pwd)"
@@ -68,6 +68,7 @@ while true; do
         logger "Battery below $BATTERYLOW"
         "$SCRIPTDIR/bin/fbink" --quiet --flash -g w=-1,file="$LIMGBATT"
         # waiting time when charging until battery level is higher than "BATTERYLOW" otherwise it will fall into sleep again
+        sleep 1
         if [ "$USE_RTC" -eq 1 ]; then
             "$SCRIPTDIR/bin/rtcwake" -d "rtc$RTC" -s "$BATTERYSLEEP" -m mem
         else
@@ -205,7 +206,7 @@ while true; do
                     logger "clearing screen"
                     eips -c
                     sleep 1
-                fi
+                fi 
                 logger "rendering screen"
                 "$SCRIPTDIR/bin/fbink" --quiet --flash -g w=-1,file="$SCREENSAVERFILE"
                 if [ "$DISPLAY_REFRESH_TIME" = true ] ; then
@@ -215,6 +216,7 @@ while true; do
                 if [ "$DISPLAY_BATTERY_LEVEL" = true ] ; then
                     # display battery %
                     bat="${BATTERYLEVEL}%"
+                    # shellcheck disable=SC3037  # echo flags work in this shell
                     batLen="$(echo -n "$bat" | wc -c)"
                     "$SCRIPTDIR/bin/fbink" --quiet --flash --size 1 -y -1 -x -"$batLen" "$bat"
                 fi
@@ -252,12 +254,15 @@ while true; do
         WAKEUPTIME=$((TODAY + INTERVAL_ON_ERROR - DELAY_BEFORE_SUSPEND))
         logger "An error has occurred, will try again on $WAKEUPTIME"
 
+        sleep 1
         if [ ${GLOBAL_ERROR_COUNT} -ge 10 ]; then
             logger "REBOOT BECAUSE OF 10 ERRORS"
+            sleep 1
             reboot
         fi
 
-        if [ "$USE_RTC" -eq 1 ]; then
+        if [ "$USE_RTC" -eq 1 ] && ! (/usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}' | grep -qi 'yes'); then
+            # only use RTC sleep when on battery
             "$SCRIPTDIR/bin/rtcwake" -d "rtc$RTC" -s "$INTERVAL_ON_ERROR" -m mem
         else
             sleep "$INTERVAL_ON_ERROR"
@@ -269,7 +274,10 @@ while true; do
         logger "SUCCESS, will update again on $WAKEUPTIME"
 
         logger "sleeping for $INTERVAL sec"
-        if [ "$USE_RTC" -eq 1 ]; then
+        sleep 1
+
+        if [ "$USE_RTC" -eq 1 ] && ! (/usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}' | grep -qi 'yes'); then
+            # only use RTC sleep when on battery
             "$SCRIPTDIR/bin/rtcwake" -d "rtc$RTC" -s "$INTERVAL" -m mem
         else    
             sleep "$INTERVAL"

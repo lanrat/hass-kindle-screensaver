@@ -169,7 +169,8 @@ while true; do
             if /usr/bin/powerd_test -s | awk -F: '/Charging/ {print substr($2,2,length($2))}' | grep -qi 'yes'; then
                 CHARGING=true
                 # unable to get accurate battery levels while charing
-                BATTERYLEVEL="unknown"
+                # use 100 here so that entiry is not shown as unknown in HASS
+                BATTERYLEVEL="100"
             fi
 
             logger "Downloading and drawing image"
